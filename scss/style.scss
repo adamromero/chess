@@ -1,0 +1,67 @@
+html {
+   background: black;
+}
+
+h1 {
+   color: white;
+   text-align: center;
+   text-transform: uppercase;
+}
+
+.board {
+   display: grid;
+   grid-template-columns: repeat(8, 1fr);
+   max-width: 740px;
+   margin: auto;
+   border: 1px solid white;
+   background: white;
+}
+
+.cell {
+   height: 80px;
+
+   &.black {
+      background: black;
+   }
+}
+
+.piece {
+   background-position: 23px;
+   background-size: 50%;
+   display: block;
+   height: 80px;
+   width: 91px;
+   background-repeat: no-repeat;
+}
+
+.bp {
+   background-image: url("../pieces/b1.png");
+}
+
+.br {
+   background-image: url("../pieces/b2.png");
+}
+
+.bk {
+   background-image: url("../pieces/b3.png");
+}
+
+.bb {
+   background-image: url("../pieces/b4.png");
+}
+
+.wp {
+   background-image: url("../pieces/w1.png");
+}
+
+.wr {
+   background-image: url("../pieces/w2.png");
+}
+
+.wk {
+   background-image: url("../pieces/w5.png");
+}
+
+.wb {
+   background-image: url("../pieces/w4.png");
+}
