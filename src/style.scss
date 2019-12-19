@@ -21,17 +21,23 @@ h1 {
    height: 80px;
 
    &.black {
-      background: black;
+      background: #636363;
    }
 }
 
 .piece {
+   box-sizing: border-box;
    background-position: 23px;
    background-size: 50%;
    display: block;
    height: 80px;
    width: 91px;
    background-repeat: no-repeat;
+   cursor: pointer;
+}
+
+.hold {
+   border: 3px solid black;
 }
 
 .bp {
@@ -42,12 +48,20 @@ h1 {
    background-image: url("../pieces/b2.png");
 }
 
-.bk {
+.bkn {
    background-image: url("../pieces/b3.png");
 }
 
 .bb {
    background-image: url("../pieces/b4.png");
+}
+
+.bq {
+   background-image: url("../pieces/b6.png");
+}
+
+.bkg {
+   background-image: url("../pieces/b5.png");
 }
 
 .wp {
@@ -58,10 +72,18 @@ h1 {
    background-image: url("../pieces/w2.png");
 }
 
-.wk {
+.wkn {
    background-image: url("../pieces/w5.png");
 }
 
 .wb {
    background-image: url("../pieces/w4.png");
+}
+
+.wq {
+   background-image: url("../pieces/w6.png");
+}
+
+.wkg {
+   background-image: url("../pieces/w5.png");
 }
