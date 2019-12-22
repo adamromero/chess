@@ -15,10 +15,12 @@ h1 {
    margin: auto;
    border: 1px solid white;
    background: white;
+   transform: translateY(15%);
 }
 
 .cell {
    height: 80px;
+   box-sizing: border-box;
 
    &.black {
       background: #636363;
@@ -26,64 +28,11 @@ h1 {
 }
 
 .piece {
-   box-sizing: border-box;
-   background-position: 23px;
-   background-size: 50%;
    display: block;
-   height: 80px;
-   width: 91px;
-   background-repeat: no-repeat;
+   margin: auto;
    cursor: pointer;
 }
 
-.hold {
-   border: 3px solid black;
-}
-
-.bp {
-   background-image: url("../pieces/b1.png");
-}
-
-.br {
-   background-image: url("../pieces/b2.png");
-}
-
-.bkn {
-   background-image: url("../pieces/b3.png");
-}
-
-.bb {
-   background-image: url("../pieces/b4.png");
-}
-
-.bq {
-   background-image: url("../pieces/b6.png");
-}
-
-.bkg {
-   background-image: url("../pieces/b5.png");
-}
-
-.wp {
-   background-image: url("../pieces/w1.png");
-}
-
-.wr {
-   background-image: url("../pieces/w2.png");
-}
-
-.wkn {
-   background-image: url("../pieces/w5.png");
-}
-
-.wb {
-   background-image: url("../pieces/w4.png");
-}
-
-.wq {
-   background-image: url("../pieces/w6.png");
-}
-
-.wkg {
-   background-image: url("../pieces/w5.png");
+.hovered {
+   border: 2px solid yellow;
 }

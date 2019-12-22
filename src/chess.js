@@ -3,6 +3,7 @@ import { boardArray } from "./boardArray.js";
 
 const board = document.getElementById("board");
 const BOARD_SIZE = 8;
+let currentPiece;
 
 const createBoard = () => {
    for (let row = 0; row < BOARD_SIZE; row++) {
@@ -21,27 +22,50 @@ const setBoard = () => {
    for (let i = 0; i < BOARD_SIZE * BOARD_SIZE; i++) {
       const piece = boardArray[i];
       if (piece !== 0) {
-         const htmlPieceClass = piece.getPieceClass();
+         const htmlPieceSource = piece.getPieceImage();
          board.childNodes[
             i
-         ].innerHTML = `<div class="piece ${htmlPieceClass}" draggable="true"></div>`;
+         ].innerHTML = `<img class="piece" src="./pieces/${htmlPieceSource}.png" draggable="true"></div>`;
       }
    }
 };
 
+function dragOver(e) {
+   e.preventDefault();
+}
+
+function dragEnter(e) {
+   e.preventDefault();
+   this.classList.add("hovered");
+}
+
+function dragLeave() {
+   this.classList.remove("hovered");
+}
+
+function dragDrop() {
+   this.append(currentPiece);
+}
+
 const bindMovement = () => {
    const pieces = document.querySelectorAll(".piece");
+   const cells = document.querySelectorAll(".cell");
 
    pieces.forEach(piece => {
       piece.addEventListener("dragstart", function() {
-         console.log("drag start");
-         this.className += " hold";
+         currentPiece = this;
       });
 
       piece.addEventListener("dragend", function() {
-         console.log("drag end");
-         this.classList.remove("hold");
+         this.parentNode.classList.remove("hovered");
       });
+   });
+
+   cells.forEach(cell => {
+      cell.addEventListener("dragover", dragOver);
+      cell.addEventListener("dragenter", dragEnter);
+      cell.addEventListener("dragleave", dragLeave);
+      cell.addEventListener("drop", dragDrop);
    });
 };
 

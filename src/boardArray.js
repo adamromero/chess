@@ -18,7 +18,7 @@ class Piece {
       return this.boardId;
    }
 
-   getPieceClass() {
+   getPieceImage() {
       return this.image;
    }
 }
