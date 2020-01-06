@@ -1,34 +1,26 @@
 import "./style.scss";
-import { boardArray } from "./boardArray.js";
+//import { boardArray } from "./boardArray.js";
 
-const board = document.getElementById("board");
+const board = document.getElementById("board").childNodes;
 const BOARD_SIZE = 8;
 let currentPiece;
 
-const createBoard = () => {
-   for (let row = 0; row < BOARD_SIZE; row++) {
-      for (let col = 0; col < BOARD_SIZE; col++) {
-         let tile = "";
-         if (col % 2 !== row % 2) {
-            tile = "black";
-         }
-         board.innerHTML += `<div class="cell ${tile}"></div>`;
-      }
-   }
-   setBoard();
-};
+function isValidMove(piece, cell) {
+   let validMove = true;
 
-const setBoard = () => {
-   for (let i = 0; i < BOARD_SIZE * BOARD_SIZE; i++) {
-      const piece = boardArray[i];
-      if (piece !== 0) {
-         const htmlPieceSource = piece.getPieceImage();
-         board.childNodes[
-            i
-         ].innerHTML = `<img class="piece" src="./pieces/${htmlPieceSource}.png" draggable="true"></div>`;
-      }
+   console.log(cell.getAttribute("index"));
+
+   if (piece === "wp") {
+      validMove = true;
    }
-};
+
+   return validMove && isCellEmpty(cell);
+}
+
+function isCellEmpty(cell) {
+   return !cell.childNodes.length
+}
+
 
 function dragOver(e) {
    e.preventDefault();
@@ -44,12 +36,16 @@ function dragLeave() {
 }
 
 function dragDrop() {
-   this.append(currentPiece);
+   const piece = currentPiece.classList[1];
+   const cell = this;
+   if (isValidMove(piece, cell)) {
+      console.log('its valid');
+      this.append(currentPiece);
+   }
 }
 
 const bindMovement = () => {
    const pieces = document.querySelectorAll(".piece");
-   const cells = document.querySelectorAll(".cell");
 
    pieces.forEach(piece => {
       piece.addEventListener("dragstart", function() {
@@ -61,7 +57,7 @@ const bindMovement = () => {
       });
    });
 
-   cells.forEach(cell => {
+   board.forEach(cell => {
       cell.addEventListener("dragover", dragOver);
       cell.addEventListener("dragenter", dragEnter);
       cell.addEventListener("dragleave", dragLeave);
@@ -70,7 +66,6 @@ const bindMovement = () => {
 };
 
 const init = () => {
-   createBoard();
    bindMovement();
 };
 
