@@ -5,20 +5,51 @@ const board = document.getElementById("board").childNodes;
 const BOARD_SIZE = 8;
 let currentPiece;
 
-function isValidMove(piece, cell) {
-   let validMove = true;
 
-   console.log(cell.getAttribute("index"));
+
+
+function piecePositionCheck(piece, pieceIndex, cellIndex) {
+   let validMove = false;
+
+   const cellPosition = { 
+      cellX: cellIndex % 8, 
+      cellY: Math.floor(cellIndex / 8)
+   };
+
+   const piecePosition = { 
+      cellX: pieceIndex % 8, 
+      cellY: Math.floor(pieceIndex / 8)
+   };
+
+   console.log(piece);
 
    if (piece === "wp") {
-      validMove = true;
+      if (pieceIndex - 8 === cellIndex || pieceIndex - 16 === cellIndex) {
+         validMove = true;
+      }
    }
 
-   return validMove && isCellEmpty(cell);
+   console.log(pieceIndex - 9);
+
+   if (piece === "wb") {
+      if (pieceIndex - 7 === cellIndex || pieceIndex - 9 === cellIndex) {
+         validMove = true;
+      }
+   }
+
+   return validMove;
+}
+
+function isValidMove(currentPiece, cell) {
+   const piece = currentPiece.classList[1] 
+   const pieceIndex = parseInt(currentPiece.parentNode.getAttribute("index"));
+   const cellIndex = parseInt(cell.getAttribute("index"));
+
+   return isCellEmpty(cell) && piecePositionCheck(piece, pieceIndex, cellIndex);
 }
 
 function isCellEmpty(cell) {
-   return !cell.childNodes.length
+   return !cell.innerHTML.trim().length
 }
 
 
@@ -36,11 +67,11 @@ function dragLeave() {
 }
 
 function dragDrop() {
-   const piece = currentPiece.classList[1];
-   const cell = this;
-   if (isValidMove(piece, cell)) {
+   if (isValidMove(currentPiece, this)) {
       console.log('its valid');
       this.append(currentPiece);
+   } else {
+      this.classList.remove("hovered");
    }
 }
 
