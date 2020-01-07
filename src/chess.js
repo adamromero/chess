@@ -1,27 +1,23 @@
 import "./style.scss";
 //import { boardArray } from "./boardArray.js";
 
-const board = document.getElementById("board").childNodes;
+const board = document.querySelectorAll(".cell");
+const pieces = document.querySelectorAll(".piece");
 const BOARD_SIZE = 8;
 let currentPiece;
-
-
-
 
 function piecePositionCheck(piece, pieceIndex, cellIndex) {
    let validMove = false;
 
-   const cellPosition = { 
-      cellX: cellIndex % 8, 
-      cellY: Math.floor(cellIndex / 8)
+   const cellPosition = {
+      cellX: cellIndex % BOARD_SIZE,
+      cellY: Math.floor(cellIndex / BOARD_SIZE)
    };
 
-   const piecePosition = { 
-      cellX: pieceIndex % 8, 
-      cellY: Math.floor(pieceIndex / 8)
+   const piecePosition = {
+      cellX: pieceIndex % BOARD_SIZE,
+      cellY: Math.floor(pieceIndex / BOARD_SIZE)
    };
-
-   console.log(piece);
 
    if (piece === "wp") {
       if (pieceIndex - 8 === cellIndex || pieceIndex - 16 === cellIndex) {
@@ -29,10 +25,46 @@ function piecePositionCheck(piece, pieceIndex, cellIndex) {
       }
    }
 
-   console.log(pieceIndex - 9);
+   if (piece === "bp") {
+      if (pieceIndex + 8 === cellIndex || pieceIndex + 16 === cellIndex) {
+         validMove = true;
+      }
+   }
 
-   if (piece === "wb") {
-      if (pieceIndex - 7 === cellIndex || pieceIndex - 9 === cellIndex) {
+   //bishop check
+   if (piece === "wb" || piece === "bb") {
+      console.log("cell y: ", cellPosition.cellY);
+      console.log("cell x: ", cellPosition.cellX);
+      console.log("piece y: ", piecePosition.cellY);
+      console.log("piece x: ", piecePosition.cellX);
+      if (
+         cellPosition.cellY !== piecePosition.cellY &&
+         cellPosition.cellX !== piecePosition.cellX
+      ) {
+         validMove = true;
+      }
+   }
+
+   //rook check
+   if (piece === "wr" || piece === "br") {
+      if (
+         cellPosition.cellY === piecePosition.cellY ||
+         cellPosition.cellX === piecePosition.cellX
+      ) {
+         validMove = true;
+      }
+   }
+
+   // queen check
+   if (piece === "wq" || piece === "bq") {
+      if (
+         cellPosition.cellY === piecePosition.cellY ||
+         cellPosition.cellX === piecePosition.cellX ||
+         (cellIndex - pieceIndex) % 9 === 0 ||
+         (cellIndex - pieceIndex) % 7 === 0 ||
+         (cellIndex + pieceIndex) % 9 === 0 ||
+         (cellIndex + pieceIndex) % 7 === 0
+      ) {
          validMove = true;
       }
    }
@@ -41,7 +73,7 @@ function piecePositionCheck(piece, pieceIndex, cellIndex) {
 }
 
 function isValidMove(currentPiece, cell) {
-   const piece = currentPiece.classList[1] 
+   const piece = currentPiece.classList[1];
    const pieceIndex = parseInt(currentPiece.parentNode.getAttribute("index"));
    const cellIndex = parseInt(cell.getAttribute("index"));
 
@@ -49,50 +81,52 @@ function isValidMove(currentPiece, cell) {
 }
 
 function isCellEmpty(cell) {
-   return !cell.innerHTML.trim().length
-}
-
-
-function dragOver(e) {
-   e.preventDefault();
-}
-
-function dragEnter(e) {
-   e.preventDefault();
-   this.classList.add("hovered");
-}
-
-function dragLeave() {
-   this.classList.remove("hovered");
+   return !cell.innerHTML.trim().length;
 }
 
 function dragDrop() {
    if (isValidMove(currentPiece, this)) {
-      console.log('its valid');
+      console.log("its valid");
       this.append(currentPiece);
    } else {
       this.classList.remove("hovered");
    }
 }
 
-const bindMovement = () => {
-   const pieces = document.querySelectorAll(".piece");
+///////////////////////////////////////////////////////////////////////////
 
-   pieces.forEach(piece => {
-      piece.addEventListener("dragstart", function() {
-         currentPiece = this;
-      });
+function getValidMove() {
+   const piece = currentPiece.classList[1];
+   const pieceIndex = parseInt(currentPiece.parentNode.getAttribute("index"));
 
-      piece.addEventListener("dragend", function() {
-         this.parentNode.classList.remove("hovered");
-      });
+   if (piece === "wp") {
+      board[pieceIndex - 8].classList.add("highlight");
+      board[pieceIndex - 16].classList.add("highlight");
+   }
+}
+
+function highlightPossibleMoves() {
+   getValidMove();
+}
+
+function clearHighlights() {
+   board.forEach(function(cell) {
+      cell.classList.remove("highlight");
    });
+}
 
-   board.forEach(cell => {
-      cell.addEventListener("dragover", dragOver);
-      cell.addEventListener("dragenter", dragEnter);
-      cell.addEventListener("dragleave", dragLeave);
-      cell.addEventListener("drop", dragDrop);
+const bindMovement = () => {
+   pieces.forEach(function(piece) {
+      piece.addEventListener("click", function() {
+         if (piece.classList[2] === "highlight") {
+            this.classList.remove("highlight");
+         } else {
+            clearHighlights();
+            currentPiece = this;
+            this.classList.add("highlight");
+            highlightPossibleMoves();
+         }
+      });
    });
 };
 
