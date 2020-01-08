@@ -11,10 +11,8 @@ h1 {
 .board {
    display: grid;
    grid-template-columns: repeat(8, 1fr);
-   //max-width: 740px;
    max-width: 640px;
    margin: auto;
-   //border: 5px solid #808080;
    background: white;
    transform: translateY(15%);
 }
@@ -30,18 +28,11 @@ h1 {
          background: #599059;
       }
    }
-
-   .piece {
-      &:hover {
-         background: #699e69;
-      }
-   }
 }
 
 .piece {
    display: block;
    margin: auto;
-   cursor: pointer;
 }
 
 .hovered {
@@ -51,4 +42,5 @@ h1 {
 .highlight {
    //background: #408240;
    background: #699e69;
+   cursor: pointer;
 }
