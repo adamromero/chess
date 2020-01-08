@@ -12,18 +12,13 @@ function highlightPossibleMoves(currentPiece) {
    const piece = currentPiece.classList[1];
    const pieceIndex = parseInt(currentPiece.parentNode.getAttribute("index"));
 
-   /*
-   const cellPosition = {
-      cellX: cellIndex % BOARD_SIZE,
-      cellY: Math.floor(cellIndex / BOARD_SIZE)
-   };*/
-
    const piecePosition = {
       cellX: pieceIndex % BOARD_SIZE,
       cellY: Math.floor(pieceIndex / BOARD_SIZE)
    };
 
-   //console.log("pieceindex: ", pieceIndex);
+   console.log("piece cell x: ", piecePosition.cellX);
+   console.log("piece cell y: ", piecePosition.cellY);
 
    if (piece === "wp") {
       if (isCellEmpty(board[pieceIndex - 8])) {
@@ -35,21 +30,56 @@ function highlightPossibleMoves(currentPiece) {
       }
    }
 
-   //console.log("cell x: ", cellPosition.cellX);
-   //console.log("cell y: ", cellPosition.cellY);
-   console.log("piece cell x: ", piecePosition.cellX);
-   console.log("piece cell y: ", piecePosition.cellY);
+   if (piece === "wkn") {
+
+   }
 
    if (piece === "wb") {
-      console.log(piecePosition.cellX - 1);
-      console.log(piecePosition.cellY - 1);
-
       setDiagonalPositions(piecePosition);
    }
 
    if (piece === "wr") {
       setHorizontalVerticalPositions(piecePosition);
    }
+
+   if (piece === "wq") {
+      setDiagonalPositions(piecePosition);
+      setHorizontalVerticalPositions(piecePosition);
+   }
+
+   if (piece === "wkg") {
+      setKingPositions(piecePosition);
+   }
+
+}
+
+function setKingPositions(position) {
+   let x = position.cellX,
+      y = position.cellY;
+
+   if (x >= 0 && x < 8 && y >= 0 && y < 8)
+      board[(y - 1) * 8 + (x - 1)].classList.add("highlight");
+
+   if (x >= 0 && x < 8 && y >= 0 && y < 8)
+      board[(y - 1) * 8 + x].classList.add("highlight");
+
+   if (x >= 0 && x < 8 && y >= 0 && y < 8)
+      board[(y - 1) * 8 + (x + 1)].classList.add("highlight");
+
+   if (x >= 0 && x < 8 && y >= 0 && y < 8)
+      board[y * 8 + (x - 1)].classList.add("highlight");
+
+   if (x >= 0 && x < 8 && y >= 0 && y < 8)
+      board[y * 8 + (x + 1)].classList.add("highlight");
+
+   if (y < 7)
+      board[(y + 1) * 8 + (x - 1)].classList.add("highlight");
+
+   if (y < 7)
+      board[(y + 1) * 8 + x].classList.add("highlight");
+
+   if (y < 7)
+      board[(y + 1) * 8 + (x + 1)].classList.add("highlight");
 }
 
 function setHorizontalVerticalPositions(position) {
