@@ -16,35 +16,49 @@ function highlightPossibleMoves(currentPiece) {
    console.log("piece cell x: ", piecePosition.cellX);
    console.log("piece cell y: ", piecePosition.cellY);
 
-   if (piece === "wp") {
-      setPawnPositions(piecePosition);
+   const color = piece.substring(0, 1);
+
+   if (color === "w") {
+      setPieceMoves(piece, piecePosition, color);
+   } else if (color === "b") {
+      setPieceMoves(piece, piecePosition, color);
+   }
+}
+
+function setPieceMoves(fullPiece, piecePosition, color) {
+   const piece = fullPiece.substring(1, fullPiece.length);
+
+   if (piece === "p") {
+      setPawnPositions(piecePosition, color);
    }
 
-   if (piece === "wkn") {
+   if (piece === "kn") {
       setKnightPositions(piecePosition);
    }
 
-   if (piece === "wb") {
+   if (piece === "b") {
       setDiagonalPositions(piecePosition);
    }
 
-   if (piece === "wr") {
+   if (piece === "r") {
       setHorizontalVerticalPositions(piecePosition);
    }
 
-   if (piece === "wq") {
+   if (piece === "q") {
       setDiagonalPositions(piecePosition);
       setHorizontalVerticalPositions(piecePosition);
    }
 
-   if (piece === "wkg") {
+   if (piece === "kg") {
       setKingPositions(piecePosition);
    }
-
 }
 
 function isCellEmpty(cell) {
-   return !cell.innerHTML.trim().length;
+   if (typeof cell !== "undefined") {
+      return !cell.innerHTML.trim().length;
+   }
+   return false;
 }
 
 function convertCoordinatesToIndex(x, y) {
@@ -61,31 +75,27 @@ function coordinatesInBounds(x, y) {
 
 function highlightEmptyCells(index) {
    const cell = board[index];
-
-   /*
    if (index > -1 && isCellEmpty(cell)) {
       cell.classList.add("highlight");
    }
-   */
-
-   if (index > -1) {
-      if (isCellEmpty(cell)) {
-         cell.classList.add("highlight");
-      } else {
-         console.log("index: ", index);
-      }
-   }
-   
 }
 
-function setPawnPositions(position) {
+function setPawnPositions(position, color) {
    let x = position.cellX,
       y = position.cellY;
 
-   highlightEmptyCells(convertCoordinatesToIndex(x, y - 1));
-   //first move for pawns have option of moving two spaces ahead
-   if (y === 6) {
-      highlightEmptyCells(convertCoordinatesToIndex(x, y - 2));
+   if (color === "w") {
+      highlightEmptyCells(convertCoordinatesToIndex(x, y - 1));
+      //first move for pawns have option of moving two spaces ahead
+      if (y === 6) {
+         highlightEmptyCells(convertCoordinatesToIndex(x, y - 2));
+      }
+   } else if (color === "b") {
+      highlightEmptyCells(convertCoordinatesToIndex(x, y + 1));
+      //first move for pawns have option of moving two spaces ahead
+      if (y === 1) {
+         highlightEmptyCells(convertCoordinatesToIndex(x, y + 2));
+      }
    }
 }
 
@@ -122,29 +132,46 @@ function setHorizontalVerticalPositions(position) {
       y = position.cellY;
 
    while (convertCoordinatesToIndex(x, y) > -1) {
+      y--;
 
-
-      highlightEmptyCells(convertCoordinatesToIndex(x, --y));
-
-      console.log("is cell empty: ", isCellEmpty(board[convertCoordinatesToIndex(x, y)]));
+      if (!isCellEmpty(board[convertCoordinatesToIndex(x, y)])) {
+         break;
+      } else {
+         highlightEmptyCells(convertCoordinatesToIndex(x, y));
+      }
    }
 
    y = position.cellY;
    while (convertCoordinatesToIndex(x, y) > -1) {
-      highlightEmptyCells(convertCoordinatesToIndex(x, ++y));
-      console.log("is cell empty: ", isCellEmpty(board[convertCoordinatesToIndex(x, y)]));
+      y++;
+
+      if (!isCellEmpty(board[convertCoordinatesToIndex(x, y)])) {
+         break;
+      } else {
+         highlightEmptyCells(convertCoordinatesToIndex(x, y));
+      }
    }
 
    y = position.cellY;
    while (convertCoordinatesToIndex(x, y) > -1) {
-      highlightEmptyCells(convertCoordinatesToIndex(--x, y));
-      console.log("is cell empty: ", isCellEmpty(board[convertCoordinatesToIndex(x, y)]));
+      x--;
+
+      if (!isCellEmpty(board[convertCoordinatesToIndex(x, y)])) {
+         break;
+      } else {
+         highlightEmptyCells(convertCoordinatesToIndex(x, y));
+      }
    }
 
    x = position.cellX;
    while (convertCoordinatesToIndex(x, y) > -1) {
-      highlightEmptyCells(convertCoordinatesToIndex(++x, y));
-      console.log("is cell empty: ", isCellEmpty(board[convertCoordinatesToIndex(x, y)]));
+      x++;
+
+      if (!isCellEmpty(board[convertCoordinatesToIndex(x, y)])) {
+         break;
+      } else {
+         highlightEmptyCells(convertCoordinatesToIndex(x, y));
+      }
    }
 }
 
@@ -154,48 +181,53 @@ function setDiagonalPositions(position) {
 
    //diagonal left up
    while (convertCoordinatesToIndex(x, y) > -1) {
-
-      highlightEmptyCells(convertCoordinatesToIndex(--x, --y));
+      x--;
+      y--;
 
       if (!isCellEmpty(board[convertCoordinatesToIndex(x, y)])) {
          break;
+      } else {
+         highlightEmptyCells(convertCoordinatesToIndex(x, y));
       }
-
-      
-      console.log("this is cell empty: ", isCellEmpty(board[convertCoordinatesToIndex(x, y)]));
    }
 
    (x = position.cellX), (y = position.cellY);
    //diagonal right up
    while (convertCoordinatesToIndex(x, y) > -1) {
-      highlightEmptyCells(convertCoordinatesToIndex(++x, --y));
+      x++;
+      y--;
 
       if (!isCellEmpty(board[convertCoordinatesToIndex(x, y)])) {
          break;
+      } else {
+         highlightEmptyCells(convertCoordinatesToIndex(x, y));
       }
-      console.log("is cell empty: ", isCellEmpty(board[convertCoordinatesToIndex(x, y)]));
    }
 
    (x = position.cellX), (y = position.cellY);
    //diagonal right down
    while (convertCoordinatesToIndex(x, y) > -1) {
-      highlightEmptyCells(convertCoordinatesToIndex(++x, ++y));
+      x++;
+      y++;
 
       if (!isCellEmpty(board[convertCoordinatesToIndex(x, y)])) {
          break;
+      } else {
+         highlightEmptyCells(convertCoordinatesToIndex(x, y));
       }
-      console.log("is cell empty: ", isCellEmpty(board[convertCoordinatesToIndex(x, y)]));
    }
 
    (x = position.cellX), (y = position.cellY);
    //diagonal left down
    while (convertCoordinatesToIndex(x, y) > -1) {
-      highlightEmptyCells(convertCoordinatesToIndex(--x, ++y));
+      x--;
+      y++;
 
       if (!isCellEmpty(board[convertCoordinatesToIndex(x, y)])) {
          break;
+      } else {
+         highlightEmptyCells(convertCoordinatesToIndex(x, y));
       }
-      console.log("is cell empty: ", isCellEmpty(board[convertCoordinatesToIndex(x, y)]));
    }
 }
 
@@ -205,12 +237,15 @@ function selectMove(currentPiece) {
    possibleMoves.forEach(function(target) {
       target.addEventListener("click", function() {
          const cellIndex = parseInt(this.getAttribute("index"));
-         const pieceIndex = parseInt(currentPiece.parentNode.getAttribute("index"));
+         const pieceIndex = parseInt(
+            currentPiece.parentNode.getAttribute("index")
+         );
 
-         if (this.classList.contains("highlight") && 
-               currentPiece.parentNode.classList.contains("selected") && 
-                  cellIndex !== pieceIndex) {
-
+         if (
+            this.classList.contains("highlight") &&
+            currentPiece.parentNode.classList.contains("selected") &&
+            cellIndex !== pieceIndex
+         ) {
             this.append(currentPiece);
             clearSelection();
          }
