@@ -20,14 +20,14 @@ h1 {
 .cell {
    height: 80px;
    box-sizing: border-box;
+}
 
-   &.black {
-      background: #636363;
+.cell.black {
+   background: #636363;
+}
 
-      &.highlight {
-         background: #599059;
-      }
-   }
+.cell.black.highlight {
+   background: #599059;
 }
 
 .piece {

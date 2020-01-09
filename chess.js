@@ -1,5 +1,3 @@
-import "./style.scss";
-
 const board = document.querySelectorAll(".cell");
 const pieces = document.querySelectorAll(".piece");
 const BOARD_SIZE = 8;
