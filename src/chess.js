@@ -4,10 +4,6 @@ const board = document.querySelectorAll(".cell");
 const pieces = document.querySelectorAll(".piece");
 const BOARD_SIZE = 8;
 
-function isCellEmpty(cell) {
-   return !cell.innerHTML.trim().length;
-}
-
 function highlightPossibleMoves(currentPiece) {
    const piece = currentPiece.classList[1];
    const pieceIndex = parseInt(currentPiece.parentNode.getAttribute("index"));
@@ -21,17 +17,11 @@ function highlightPossibleMoves(currentPiece) {
    console.log("piece cell y: ", piecePosition.cellY);
 
    if (piece === "wp") {
-      if (isCellEmpty(board[pieceIndex - 8])) {
-         board[pieceIndex - 8].classList.add("highlight");
-
-         if (isCellEmpty(board[pieceIndex - 16])) {
-            board[pieceIndex - 16].classList.add("highlight");
-         }
-      }
+      setPawnPositions(piecePosition);
    }
 
    if (piece === "wkn") {
-
+      setKnightPositions(piecePosition);
    }
 
    if (piece === "wb") {
@@ -53,71 +43,89 @@ function highlightPossibleMoves(currentPiece) {
 
 }
 
+function isCellEmpty(cell) {
+   return !cell.innerHTML.trim().length;
+}
+
+function convertCoordinatesToIndex(x, y) {
+   if (coordinatesInBounds(x, y)) {
+      return y * BOARD_SIZE + x;
+   }
+   //returns -1 to represent an out of bounds index
+   return -1;
+}
+
+function coordinatesInBounds(x, y) {
+   return x >= 0 && x < 8 && y >= 0 && y < 8;
+}
+
+function highlightEmptyCells(index) {
+   const cell = board[index];
+   if (index > -1 && isCellEmpty(cell)) {
+      cell.classList.add("highlight");
+   }
+}
+
+function setPawnPositions(position) {
+   let x = position.cellX,
+      y = position.cellY;
+
+   highlightEmptyCells(convertCoordinatesToIndex(x, y - 1));
+   //first move for pawns have option of moving two spaces ahead
+   if (y === 6) {
+      highlightEmptyCells(convertCoordinatesToIndex(x, y - 2));
+   }
+}
+
+function setKnightPositions(position) {
+   let x = position.cellX,
+      y = position.cellY;
+
+   highlightEmptyCells(convertCoordinatesToIndex(x + 1, y - 2));
+   highlightEmptyCells(convertCoordinatesToIndex(x - 1, y - 2));
+   highlightEmptyCells(convertCoordinatesToIndex(x - 2, y + 1));
+   highlightEmptyCells(convertCoordinatesToIndex(x - 2, y - 1));
+   highlightEmptyCells(convertCoordinatesToIndex(x + 2, y + 1));
+   highlightEmptyCells(convertCoordinatesToIndex(x + 2, y - 1));
+   highlightEmptyCells(convertCoordinatesToIndex(x + 1, y + 2));
+   highlightEmptyCells(convertCoordinatesToIndex(x - 1, y + 2));
+}
+
 function setKingPositions(position) {
    let x = position.cellX,
       y = position.cellY;
 
-   if (x >= 0 && x < 8 && y >= 0 && y < 8)
-      board[(y - 1) * 8 + (x - 1)].classList.add("highlight");
-
-   if (x >= 0 && x < 8 && y >= 0 && y < 8)
-      board[(y - 1) * 8 + x].classList.add("highlight");
-
-   if (x >= 0 && x < 8 && y >= 0 && y < 8)
-      board[(y - 1) * 8 + (x + 1)].classList.add("highlight");
-
-   if (x >= 0 && x < 8 && y >= 0 && y < 8)
-      board[y * 8 + (x - 1)].classList.add("highlight");
-
-   if (x >= 0 && x < 8 && y >= 0 && y < 8)
-      board[y * 8 + (x + 1)].classList.add("highlight");
-
-   if (y < 7)
-      board[(y + 1) * 8 + (x - 1)].classList.add("highlight");
-
-   if (y < 7)
-      board[(y + 1) * 8 + x].classList.add("highlight");
-
-   if (y < 7)
-      board[(y + 1) * 8 + (x + 1)].classList.add("highlight");
+   highlightEmptyCells(convertCoordinatesToIndex(x - 1, y - 1));
+   highlightEmptyCells(convertCoordinatesToIndex(x, y - 1));
+   highlightEmptyCells(convertCoordinatesToIndex(x + 1, y - 1));
+   highlightEmptyCells(convertCoordinatesToIndex(x - 1, y));
+   highlightEmptyCells(convertCoordinatesToIndex(x + 1, y));
+   highlightEmptyCells(convertCoordinatesToIndex(x - 1, y + 1));
+   highlightEmptyCells(convertCoordinatesToIndex(x, y + 1));
+   highlightEmptyCells(convertCoordinatesToIndex(x + 1, y + 1));
 }
 
 function setHorizontalVerticalPositions(position) {
    let x = position.cellX,
       y = position.cellY;
 
-   while (x >= 0 && x < 8 && y >= 0 && y < 8) {
-      y--;
-      if (x >= 0 && x < 8 && y >= 0 && y < 8) {
-         board[y * 8 + x].classList.add("highlight");
-      }
+   while (convertCoordinatesToIndex(x, y) > -1) {
+      highlightEmptyCells(convertCoordinatesToIndex(x, --y));
    }
 
-   (x = position.cellX), (y = position.cellY);
-
-   while (x >= 0 && x < 8 && y >= 0 && y < 8) {
-      y++;
-      if (x >= 0 && x < 8 && y >= 0 && y < 8) {
-         board[y * 8 + x].classList.add("highlight");
-      }
+   y = position.cellY;
+   while (convertCoordinatesToIndex(x, y) > -1) {
+      highlightEmptyCells(convertCoordinatesToIndex(x, ++y));
    }
 
-   (x = position.cellX), (y = position.cellY);
-
-   while (x >= 0 && x < 8 && y >= 0 && y < 8) {
-      x--;
-      if (x >= 0 && x < 8 && y >= 0 && y < 8) {
-         board[y * 8 + x].classList.add("highlight");
-      }
+   y = position.cellY;
+   while (convertCoordinatesToIndex(x, y) > -1) {
+      highlightEmptyCells(convertCoordinatesToIndex(--x, y));
    }
 
-   (x = position.cellX), (y = position.cellY);
-
-   while (x >= 0 && x < 8 && y >= 0 && y < 8) {
-      x++;
-      if (x >= 0 && x < 8 && y >= 0 && y < 8) {
-         board[y * 8 + x].classList.add("highlight");
-      }
+   x = position.cellX;
+   while (convertCoordinatesToIndex(x, y) > -1) {
+      highlightEmptyCells(convertCoordinatesToIndex(++x, y));
    }
 }
 
@@ -126,46 +134,26 @@ function setDiagonalPositions(position) {
       y = position.cellY;
 
    //diagonal left up
-   while (x >= 0 && y >= 0) {
-      x--;
-      y--;
-      if (x >= 0 && y >= 0) {
-         board[y * 8 + x].classList.add("highlight");
-      }
+   while (convertCoordinatesToIndex(x, y) > -1) {
+      highlightEmptyCells(convertCoordinatesToIndex(--x, --y));
    }
 
    (x = position.cellX), (y = position.cellY);
-
    //diagonal right up
-   while (x < 8 && y >= 0) {
-      x++;
-      y--;
-
-      if (x < 8 && y >= 0) {
-         board[y * 8 + x].classList.add("highlight");
-      }
+   while (convertCoordinatesToIndex(x, y) > -1) {
+      highlightEmptyCells(convertCoordinatesToIndex(++x, --y));
    }
 
    (x = position.cellX), (y = position.cellY);
-
    //diagonal right down
-   while (x < 8 && y < 8) {
-      x++;
-      y++;
-      if (x < 8 && y < 8) {
-         board[y * 8 + x].classList.add("highlight");
-      }
+   while (convertCoordinatesToIndex(x, y) > -1) {
+      highlightEmptyCells(convertCoordinatesToIndex(++x, ++y));
    }
 
    (x = position.cellX), (y = position.cellY);
-
    //diagonal left down
-   while (x >= 0 && y < 8) {
-      x--;
-      y++;
-      if (x >= 0 && y < 8) {
-         board[y * 8 + x].classList.add("highlight");
-      }
+   while (convertCoordinatesToIndex(x, y) > -1) {
+      highlightEmptyCells(convertCoordinatesToIndex(--x, ++y));
    }
 }
 
@@ -175,11 +163,9 @@ function selectMove(currentPiece) {
    possibleMoves.forEach(function(target) {
       target.addEventListener("click", function() {
          const cellIndex = parseInt(this.getAttribute("index"));
-         const pieceIndex = parseInt(
-            currentPiece.parentNode.getAttribute("index")
-         );
+         const pieceIndex = parseInt(currentPiece.parentNode.getAttribute("index"));
 
-         if (cellIndex !== pieceIndex) {
+         if (this.classList.contains("highlight") && cellIndex !== pieceIndex) {
             this.append(currentPiece);
             clearSelection();
          }
