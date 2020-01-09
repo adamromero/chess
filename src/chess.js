@@ -3,6 +3,7 @@ import "./style.scss";
 const board = document.querySelectorAll(".cell");
 const pieces = document.querySelectorAll(".piece");
 const BOARD_SIZE = 8;
+let whiteTurn = true;
 
 function highlightPossibleMoves(currentPiece) {
    const piece = currentPiece.classList[1];
@@ -248,6 +249,7 @@ function selectMove(currentPiece) {
          ) {
             this.append(currentPiece);
             clearSelection();
+            whiteTurn = !whiteTurn;
          }
       });
    });
@@ -264,18 +266,26 @@ const bindMovement = () => {
    pieces.forEach(function(piece) {
       piece.addEventListener("click", function() {
          const currentPiece = this;
-         if (currentPiece.parentNode.classList.contains("selected")) {
-            clearSelection();
-         } else {
-            clearSelection();
-            currentPiece.parentNode.classList.add("selected");
-            highlightPossibleMoves(currentPiece);
-            selectMove(currentPiece);
+         const playerTurn = whiteTurn ? "w" : "b";
+
+         if (playerTurn === currentPiece.classList[1].substring(0, 1)) {
+            if (currentPiece.parentNode.classList.contains("selected")) {
+               clearSelection();
+            } else {
+               clearSelection();
+               currentPiece.parentNode.classList.add("selected");
+               highlightPossibleMoves(currentPiece);
+               selectMove(currentPiece);
+            }
          }
       });
 
       piece.addEventListener("mouseover", function() {
-         this.parentNode.classList.add("highlight");
+         const currentPiece = this;
+         const playerTurn = whiteTurn ? "w" : "b";
+         if (playerTurn === currentPiece.classList[1].substring(0, 1)) {
+            this.parentNode.classList.add("highlight");
+         }
       });
 
       piece.addEventListener("mouseout", function() {
