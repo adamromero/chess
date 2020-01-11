@@ -15,10 +15,7 @@ const Chess = (function() {
       return x >= 0 && x < BOARD_SIZE && y >= 0 && y < BOARD_SIZE;
    }
 
-   function setPawnPositions(position, color) {
-      let x = position.cellX,
-         y = position.cellY;
-
+   function setPawnPositions(x, y, color) {
       if (color === "w") {
          setHighlightOnValidCells(x, y, [0, -1], false);
          //first move for pawns have option of moving two spaces ahead
@@ -34,10 +31,7 @@ const Chess = (function() {
       }
    }
 
-   function setKnightPositions(position) {
-      let x = position.cellX,
-         y = position.cellY;
-
+   function setKnightPositions(x, y) {
       setHighlightOnValidCells(x, y, [1, -2], false);
       setHighlightOnValidCells(x, y, [-1, -2], false);
       setHighlightOnValidCells(x, y, [-2, 1], false);
@@ -48,10 +42,7 @@ const Chess = (function() {
       setHighlightOnValidCells(x, y, [-1, 2], false);
    }
 
-   function setKingPositions(position) {
-      let x = position.cellX,
-         y = position.cellY;
-
+   function setKingPositions(x, y) {
       setHighlightOnValidCells(x, y, [-1, -1], false);
       setHighlightOnValidCells(x, y, [0, -1], false);
       setHighlightOnValidCells(x, y, [1, -1], false);
@@ -62,20 +53,14 @@ const Chess = (function() {
       setHighlightOnValidCells(x, y, [1, 1], false);
    }
 
-   function setHorizontalVerticalPositions(position) {
-      let x = position.cellX,
-         y = position.cellY;
-
+   function setHorizontalVerticalPositions(x, y) {
       setHighlightOnValidCells(x, y, [0, -1], true);
       setHighlightOnValidCells(x, y, [0, 1], true);
       setHighlightOnValidCells(x, y, [-1, 0], true);
       setHighlightOnValidCells(x, y, [1, 0], true);
    }
 
-   function setDiagonalPositions(position) {
-      let x = position.cellX,
-         y = position.cellY;
-
+   function setDiagonalPositions(x, y) {
       setHighlightOnValidCells(x, y, [-1, -1], true);
       setHighlightOnValidCells(x, y, [1, -1], true);
       setHighlightOnValidCells(x, y, [1, 1], true);
@@ -137,73 +122,63 @@ const Chess = (function() {
       });
    }
 
-   function setPieceMoves(fullPiece, piecePosition, color) {
+   function setMovesForPieces(fullPiece, x, y, color) {
       const piece = fullPiece.substring(1, fullPiece.length);
 
       if (piece === "p") {
-         setPawnPositions(piecePosition, color);
+         setPawnPositions(x, y, color);
       }
 
       if (piece === "kn") {
-         setKnightPositions(piecePosition);
+         setKnightPositions(x, y);
       }
 
       if (piece === "b") {
-         setDiagonalPositions(piecePosition);
+         setDiagonalPositions(x, y);
       }
 
       if (piece === "r") {
-         setHorizontalVerticalPositions(piecePosition);
+         setHorizontalVerticalPositions(x, y);
       }
 
       if (piece === "q") {
-         setDiagonalPositions(piecePosition);
-         setHorizontalVerticalPositions(piecePosition);
+         setDiagonalPositions(x, y);
+         setHorizontalVerticalPositions(x, y);
       }
 
       if (piece === "kg") {
-         setKingPositions(piecePosition);
+         setKingPositions(x, y);
       }
    }
 
    function highlightPossibleMoves(currentPiece) {
+      //get the class of the current piece
       const piece = currentPiece.classList[1];
+      //get index of the current piece selected
       const pieceIndex = parseInt(
          currentPiece.parentNode.getAttribute("index")
       );
-
-      const piecePosition = {
-         cellX: pieceIndex % BOARD_SIZE,
-         cellY: Math.floor(pieceIndex / BOARD_SIZE)
-      };
-
-      console.log("piece cell x: ", piecePosition.cellX);
-      console.log("piece cell y: ", piecePosition.cellY);
+      //convert the piece index into x and y coordinates
+      const x = pieceIndex % BOARD_SIZE;
+      const y = Math.floor(pieceIndex / BOARD_SIZE);
 
       const color = piece.substring(0, 1);
-
       if (color === "w") {
-         setPieceMoves(piece, piecePosition, color);
+         setMovesForPieces(piece, x, y, color);
       } else if (color === "b") {
-         setPieceMoves(piece, piecePosition, color);
+         setMovesForPieces(piece, x, y, color);
       }
    }
 
-   function selectMove(currentPiece) {
+   function moveSelectedPiece(currentPiece) {
       const possibleMoves = document.querySelectorAll(".highlight");
-
-      const pieceIndex = parseInt(
-         currentPiece.parentNode.getAttribute("index")
-      );
-
-      const piecePosition = {
-         cellX: pieceIndex % BOARD_SIZE,
-         cellY: Math.floor(pieceIndex / BOARD_SIZE)
-      };
 
       possibleMoves.forEach(function(target) {
          target.addEventListener("click", function() {
             const cellIndex = parseInt(this.getAttribute("index"));
+
+            console.log("currentpicec 2: ", currentPiece.parentNode);
+
             const pieceIndex = parseInt(
                currentPiece.parentNode.getAttribute("index")
             );
@@ -213,12 +188,7 @@ const Chess = (function() {
                currentPiece.parentNode.classList.contains("selected") &&
                cellIndex !== pieceIndex
             ) {
-               /*
-               if (!isCellEmpty(piecePosition.cellX, piecePosition.cellY)) {
-                  console.log(this);
-                  this.firstElementChild.remove();
-               }
-*/
+               this.innerHTML = "";
                this.append(currentPiece);
                clearSelection();
                whiteTurn = !whiteTurn;
@@ -233,6 +203,8 @@ const Chess = (function() {
             const currentPiece = this;
             const playerTurn = whiteTurn ? "w" : "b";
 
+            console.log("currentpiece: ", currentPiece);
+
             if (playerTurn === currentPiece.classList[1].substring(0, 1)) {
                if (currentPiece.parentNode.classList.contains("selected")) {
                   clearSelection();
@@ -240,7 +212,7 @@ const Chess = (function() {
                   clearSelection();
                   currentPiece.parentNode.classList.add("selected");
                   highlightPossibleMoves(currentPiece);
-                  selectMove(currentPiece);
+                  moveSelectedPiece(currentPiece);
                }
             }
          });
@@ -254,14 +226,11 @@ const Chess = (function() {
          });
 
          piece.addEventListener("mouseout", function() {
-            /*
-            if (
-               playerTurn ===
-               currentPiece.classList[1].substring(0, 1)
-            ) {
-               */
-            this.parentNode.classList.remove("highlight");
-            //}
+            const currentPiece = this;
+            const playerTurn = whiteTurn ? "w" : "b";
+            if (playerTurn === currentPiece.classList[1].substring(0, 1)) {
+               this.parentNode.classList.remove("highlight");
+            }
          });
       });
    }
