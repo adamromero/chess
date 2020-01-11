@@ -15,7 +15,6 @@ const Chess = (function() {
       return x >= 0 && x < BOARD_SIZE && y >= 0 && y < BOARD_SIZE;
    }
 
-   //TODO: block 2 tile jump when a piece is in front of it
    function setPawnPositions(x, y, color) {
       if (color === "w") {
          if (!cellIsTakenByOpponent(x, y - 1)) {
@@ -23,8 +22,9 @@ const Chess = (function() {
          }
          //first move for pawns have option of moving two spaces ahead
          if (y === 6) {
-            setHighlightOnValidCells(x, y, [0, -2], false);
-
+            if (cellIsEmpty(x, y - 1)) {
+               setHighlightOnValidCells(x, y, [0, -2], false);
+            }
             if (cellIsTakenByOpponent(x - 1, y - 1)) {
                setHighlightOnValidCells(x, y, [-1, -1], false);
             }
@@ -45,7 +45,9 @@ const Chess = (function() {
          }
          //first move for pawns have option of moving two spaces ahead
          if (y === 1) {
-            setHighlightOnValidCells(x, y, [0, 2], false);
+            if (cellIsEmpty(x, y + 1)) {
+               setHighlightOnValidCells(x, y, [0, 2], false);
+            }
             if (cellIsTakenByOpponent(x - 1, y + 1)) {
                setHighlightOnValidCells(x, y, [-1, 1], false);
             }
