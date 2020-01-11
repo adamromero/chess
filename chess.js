@@ -8,7 +8,6 @@ const Chess = (function() {
       if (coordinatesInBounds(x, y)) {
          return y * BOARD_SIZE + x;
       }
-      //returns -1 to represent an out of bounds index
       return -1;
    }
 
@@ -21,16 +20,16 @@ const Chess = (function() {
          y = position.cellY;
 
       if (color === "w") {
-         highlightEmptyCells(convertCoordinatesToIndex(x, y - 1));
+         setHighlightOnValidCells(x, y, [0, -1], false);
          //first move for pawns have option of moving two spaces ahead
          if (y === 6) {
-            highlightEmptyCells(convertCoordinatesToIndex(x, y - 2));
+            setHighlightOnValidCells(x, y, [0, -2], false);
          }
       } else if (color === "b") {
-         highlightEmptyCells(convertCoordinatesToIndex(x, y + 1));
+         setHighlightOnValidCells(x, y, [0, 1], false);
          //first move for pawns have option of moving two spaces ahead
          if (y === 1) {
-            highlightEmptyCells(convertCoordinatesToIndex(x, y + 2));
+            setHighlightOnValidCells(x, y, [0, 2], false);
          }
       }
    }
@@ -39,178 +38,96 @@ const Chess = (function() {
       let x = position.cellX,
          y = position.cellY;
 
-      highlightEmptyCells(convertCoordinatesToIndex(x + 1, y - 2));
-      highlightEmptyCells(convertCoordinatesToIndex(x - 1, y - 2));
-      highlightEmptyCells(convertCoordinatesToIndex(x - 2, y + 1));
-      highlightEmptyCells(convertCoordinatesToIndex(x - 2, y - 1));
-      highlightEmptyCells(convertCoordinatesToIndex(x + 2, y + 1));
-      highlightEmptyCells(convertCoordinatesToIndex(x + 2, y - 1));
-      highlightEmptyCells(convertCoordinatesToIndex(x + 1, y + 2));
-      highlightEmptyCells(convertCoordinatesToIndex(x - 1, y + 2));
+      setHighlightOnValidCells(x, y, [1, -2], false);
+      setHighlightOnValidCells(x, y, [-1, -2], false);
+      setHighlightOnValidCells(x, y, [-2, 1], false);
+      setHighlightOnValidCells(x, y, [-2, -1], false);
+      setHighlightOnValidCells(x, y, [2, 1], false);
+      setHighlightOnValidCells(x, y, [2, -1], false);
+      setHighlightOnValidCells(x, y, [1, 2], false);
+      setHighlightOnValidCells(x, y, [-1, 2], false);
    }
 
    function setKingPositions(position) {
       let x = position.cellX,
          y = position.cellY;
 
-      highlightEmptyCells(convertCoordinatesToIndex(x - 1, y - 1));
-      highlightEmptyCells(convertCoordinatesToIndex(x, y - 1));
-      highlightEmptyCells(convertCoordinatesToIndex(x + 1, y - 1));
-      highlightEmptyCells(convertCoordinatesToIndex(x - 1, y));
-      highlightEmptyCells(convertCoordinatesToIndex(x + 1, y));
-      highlightEmptyCells(convertCoordinatesToIndex(x - 1, y + 1));
-      highlightEmptyCells(convertCoordinatesToIndex(x, y + 1));
-      highlightEmptyCells(convertCoordinatesToIndex(x + 1, y + 1));
+      setHighlightOnValidCells(x, y, [-1, -1], false);
+      setHighlightOnValidCells(x, y, [0, -1], false);
+      setHighlightOnValidCells(x, y, [1, -1], false);
+      setHighlightOnValidCells(x, y, [-1, 0], false);
+      setHighlightOnValidCells(x, y, [1, 0], false);
+      setHighlightOnValidCells(x, y, [-1, 1], false);
+      setHighlightOnValidCells(x, y, [0, 1], false);
+      setHighlightOnValidCells(x, y, [1, 1], false);
    }
 
    function setHorizontalVerticalPositions(position) {
       let x = position.cellX,
          y = position.cellY;
 
-      while (convertCoordinatesToIndex(x, y) > -1) {
-         y--;
-
-         if (!isCellEmpty(board[convertCoordinatesToIndex(x, y)])) {
-            break;
-         } else {
-            highlightEmptyCells(convertCoordinatesToIndex(x, y));
-         }
-      }
-
-      y = position.cellY;
-      while (convertCoordinatesToIndex(x, y) > -1) {
-         y++;
-
-         if (!isCellEmpty(board[convertCoordinatesToIndex(x, y)])) {
-            break;
-         } else {
-            highlightEmptyCells(convertCoordinatesToIndex(x, y));
-         }
-      }
-
-      y = position.cellY;
-      while (convertCoordinatesToIndex(x, y) > -1) {
-         x--;
-
-         if (!isCellEmpty(board[convertCoordinatesToIndex(x, y)])) {
-            break;
-         } else {
-            highlightEmptyCells(convertCoordinatesToIndex(x, y));
-         }
-      }
-
-      x = position.cellX;
-      while (convertCoordinatesToIndex(x, y) > -1) {
-         x++;
-
-         if (!isCellEmpty(board[convertCoordinatesToIndex(x, y)])) {
-            break;
-         } else {
-            highlightEmptyCells(convertCoordinatesToIndex(x, y));
-         }
-      }
+      setHighlightOnValidCells(x, y, [0, -1], true);
+      setHighlightOnValidCells(x, y, [0, 1], true);
+      setHighlightOnValidCells(x, y, [-1, 0], true);
+      setHighlightOnValidCells(x, y, [1, 0], true);
    }
 
    function setDiagonalPositions(position) {
       let x = position.cellX,
          y = position.cellY;
 
-      //diagonal left up
-      while (convertCoordinatesToIndex(x, y) > -1) {
-         x--;
-         y--;
+      setHighlightOnValidCells(x, y, [-1, -1], true);
+      setHighlightOnValidCells(x, y, [1, -1], true);
+      setHighlightOnValidCells(x, y, [1, 1], true);
+      setHighlightOnValidCells(x, y, [-1, 1], true);
+   }
 
-         if (
-            !isCellEmpty(board[convertCoordinatesToIndex(x, y)]) &&
-            !isTakenCellOpponent(board[convertCoordinatesToIndex(x, y)])
-         ) {
-            break;
+   function setHighlightOnValidCells(x, y, shiftCoordinates, spanBoard) {
+      let pieceBlocking = false;
+      while (true) {
+         x += shiftCoordinates[0];
+         y += shiftCoordinates[1];
+         if (coordinatesInBounds(x, y) && !pieceBlocking) {
+            if (isCellEmpty(x, y)) {
+               setHighlight(y * 8 + x);
+            } else {
+               pieceBlocking = true;
+               if (isTakenCellOpponent(x, y)) {
+                  setHighlight(y * 8 + x);
+               } else {
+                  break;
+               }
+            }
+            if (!spanBoard) {
+               break;
+            }
          } else {
-            highlightEmptyCells(convertCoordinatesToIndex(x, y));
-         }
-      }
-
-      (x = position.cellX), (y = position.cellY);
-      //diagonal right up
-      while (convertCoordinatesToIndex(x, y) > -1) {
-         x++;
-         y--;
-
-         if (
-            !isCellEmpty(board[convertCoordinatesToIndex(x, y)]) &&
-            !isTakenCellOpponent(board[convertCoordinatesToIndex(x, y)])
-         ) {
             break;
-         } else {
-            highlightEmptyCells(convertCoordinatesToIndex(x, y));
-         }
-      }
-
-      (x = position.cellX), (y = position.cellY);
-      //diagonal right down
-      while (convertCoordinatesToIndex(x, y) > -1) {
-         x++;
-         y++;
-
-         if (
-            !isCellEmpty(board[convertCoordinatesToIndex(x, y)]) &&
-            !isTakenCellOpponent(board[convertCoordinatesToIndex(x, y)])
-         ) {
-            break;
-         } else {
-            highlightEmptyCells(convertCoordinatesToIndex(x, y));
-         }
-      }
-
-      (x = position.cellX), (y = position.cellY);
-      //diagonal left down
-      while (convertCoordinatesToIndex(x, y) > -1) {
-         x--;
-         y++;
-
-         if (
-            !isCellEmpty(board[convertCoordinatesToIndex(x, y)]) &&
-            !isTakenCellOpponent(board[convertCoordinatesToIndex(x, y)])
-         ) {
-            break;
-         } else {
-            highlightEmptyCells(convertCoordinatesToIndex(x, y));
          }
       }
    }
 
-   function isTakenCellOpponent(cell) {
+   function isTakenCellOpponent(x, y) {
+      const cell = board[convertCoordinatesToIndex(x, y)];
       const playerTurn = whiteTurn ? "w" : "b";
 
       if (typeof cell !== "undefined" && cell.innerHTML.trim().length) {
-         //console.log(cell.firstElementChild);
          const color = cell.firstElementChild.classList[1].substring(0, 1);
-
-         console.log("color not equal turn: ", color === playerTurn);
-         console.log("color: ", color);
-
-         return color === playerTurn;
+         return color !== playerTurn;
       }
       return false;
    }
 
-   function isCellEmpty(cell) {
+   function isCellEmpty(x, y) {
+      const cell = board[convertCoordinatesToIndex(x, y)];
       if (typeof cell !== "undefined") {
          return !cell.innerHTML.trim().length;
       }
       return false;
    }
 
-   function highlightEmptyCells(index) {
-      const cell = board[index];
-
-      if (index > -1 && isCellEmpty(cell)) {
-         //cell.classList.add("highlight");
-      }
-
-      if (index > -1) {
-         cell.classList.add("highlight");
-      }
+   function setHighlight(index) {
+      board[index].classList.add("highlight");
    }
 
    function clearSelection() {
@@ -275,6 +192,15 @@ const Chess = (function() {
    function selectMove(currentPiece) {
       const possibleMoves = document.querySelectorAll(".highlight");
 
+      const pieceIndex = parseInt(
+         currentPiece.parentNode.getAttribute("index")
+      );
+
+      const piecePosition = {
+         cellX: pieceIndex % BOARD_SIZE,
+         cellY: Math.floor(pieceIndex / BOARD_SIZE)
+      };
+
       possibleMoves.forEach(function(target) {
          target.addEventListener("click", function() {
             const cellIndex = parseInt(this.getAttribute("index"));
@@ -287,6 +213,12 @@ const Chess = (function() {
                currentPiece.parentNode.classList.contains("selected") &&
                cellIndex !== pieceIndex
             ) {
+               /*
+               if (!isCellEmpty(piecePosition.cellX, piecePosition.cellY)) {
+                  console.log(this);
+                  this.firstElementChild.remove();
+               }
+*/
                this.append(currentPiece);
                clearSelection();
                whiteTurn = !whiteTurn;
@@ -301,10 +233,7 @@ const Chess = (function() {
             const currentPiece = this;
             const playerTurn = whiteTurn ? "w" : "b";
 
-            if (
-               playerTurn === currentPiece.classList[1].substring(0, 1) ||
-               true
-            ) {
+            if (playerTurn === currentPiece.classList[1].substring(0, 1)) {
                if (currentPiece.parentNode.classList.contains("selected")) {
                   clearSelection();
                } else {
@@ -319,16 +248,20 @@ const Chess = (function() {
          piece.addEventListener("mouseover", function() {
             const currentPiece = this;
             const playerTurn = whiteTurn ? "w" : "b";
-            if (
-               playerTurn === currentPiece.classList[1].substring(0, 1) ||
-               true
-            ) {
+            if (playerTurn === currentPiece.classList[1].substring(0, 1)) {
                this.parentNode.classList.add("highlight");
             }
          });
 
          piece.addEventListener("mouseout", function() {
+            /*
+            if (
+               playerTurn ===
+               currentPiece.classList[1].substring(0, 1)
+            ) {
+               */
             this.parentNode.classList.remove("highlight");
+            //}
          });
       });
    }
