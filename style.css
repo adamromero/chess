@@ -1,5 +1,10 @@
-html {
+html,
+body {
    background: black;
+   color: white;
+   text-align: center;
+   font-size: 20px;
+   font-weight: bold;
 }
 
 h1 {
@@ -12,9 +17,8 @@ h1 {
    display: grid;
    grid-template-columns: repeat(8, 1fr);
    max-width: 512px;
-   margin: auto;
+   margin: 50px auto 40px;
    background: white;
-   transform: translateY(15%);
 }
 
 .cell {
@@ -43,4 +47,19 @@ h1 {
 .highlight {
    background: #699e69;
    cursor: pointer;
+}
+
+@media (max-width: 40.1em) {
+   .board {
+      max-width: 400px;
+   }
+
+   .cell {
+      height: 50px;
+   }
+
+   .piece {
+      max-width: 50px;
+      width: 100%;
+   }
 }

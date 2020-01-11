@@ -15,18 +15,50 @@ const Chess = (function() {
       return x >= 0 && x < BOARD_SIZE && y >= 0 && y < BOARD_SIZE;
    }
 
+   //TODO: block 2 tile jump when a piece is in front of it
    function setPawnPositions(x, y, color) {
       if (color === "w") {
-         setHighlightOnValidCells(x, y, [0, -1], false);
+         if (!cellIsTakenByOpponent(x, y - 1)) {
+            setHighlightOnValidCells(x, y, [0, -1], false);
+         }
          //first move for pawns have option of moving two spaces ahead
          if (y === 6) {
             setHighlightOnValidCells(x, y, [0, -2], false);
+
+            if (cellIsTakenByOpponent(x - 1, y - 1)) {
+               setHighlightOnValidCells(x, y, [-1, -1], false);
+            }
+            if (cellIsTakenByOpponent(x + 1, y - 1)) {
+               setHighlightOnValidCells(x, y, [1, -1], false);
+            }
+         } else {
+            if (cellIsTakenByOpponent(x - 1, y - 1)) {
+               setHighlightOnValidCells(x, y, [-1, -1], false);
+            }
+            if (cellIsTakenByOpponent(x + 1, y - 1)) {
+               setHighlightOnValidCells(x, y, [1, -1], false);
+            }
          }
       } else if (color === "b") {
-         setHighlightOnValidCells(x, y, [0, 1], false);
+         if (!cellIsTakenByOpponent(x, y + 1)) {
+            setHighlightOnValidCells(x, y, [0, 1], false);
+         }
          //first move for pawns have option of moving two spaces ahead
          if (y === 1) {
             setHighlightOnValidCells(x, y, [0, 2], false);
+            if (cellIsTakenByOpponent(x - 1, y + 1)) {
+               setHighlightOnValidCells(x, y, [-1, 1], false);
+            }
+            if (cellIsTakenByOpponent(x + 1, y + 1)) {
+               setHighlightOnValidCells(x, y, [1, 1], false);
+            }
+         } else {
+            if (cellIsTakenByOpponent(x - 1, y + 1)) {
+               setHighlightOnValidCells(x, y, [-1, 1], false);
+            }
+            if (cellIsTakenByOpponent(x + 1, y + 1)) {
+               setHighlightOnValidCells(x, y, [1, 1], false);
+            }
          }
       }
    }
@@ -73,11 +105,11 @@ const Chess = (function() {
          x += shiftCoordinates[0];
          y += shiftCoordinates[1];
          if (coordinatesInBounds(x, y) && !pieceBlocking) {
-            if (isCellEmpty(x, y)) {
+            if (cellIsEmpty(x, y)) {
                setHighlight(y * 8 + x);
             } else {
                pieceBlocking = true;
-               if (isTakenCellOpponent(x, y)) {
+               if (cellIsTakenByOpponent(x, y)) {
                   setHighlight(y * 8 + x);
                } else {
                   break;
@@ -92,7 +124,7 @@ const Chess = (function() {
       }
    }
 
-   function isTakenCellOpponent(x, y) {
+   function cellIsTakenByOpponent(x, y) {
       const cell = board[convertCoordinatesToIndex(x, y)];
       const playerTurn = whiteTurn ? "w" : "b";
 
@@ -103,7 +135,7 @@ const Chess = (function() {
       return false;
    }
 
-   function isCellEmpty(x, y) {
+   function cellIsEmpty(x, y) {
       const cell = board[convertCoordinatesToIndex(x, y)];
       if (typeof cell !== "undefined") {
          return !cell.innerHTML.trim().length;
@@ -197,6 +229,10 @@ const Chess = (function() {
       });
    }
 
+   function gameIsWon() {
+      return document.querySelectorAll(".wkg, .bkg").length === 1;
+   }
+
    function bindMovement() {
       pieces.forEach(function(piece) {
          piece.addEventListener("click", function() {
@@ -213,6 +249,13 @@ const Chess = (function() {
                   currentPiece.parentNode.classList.add("selected");
                   highlightPossibleMoves(currentPiece);
                   moveSelectedPiece(currentPiece);
+                  console.log("shitshow");
+                  if (gameIsWon()) {
+                     document.getElementById("message").innerText = `${
+                        whiteTurn ? "White" : "Black"
+                     } wins!`;
+                     //pieces.removeEventListener("click", this, true);
+                  }
                }
             }
          });
