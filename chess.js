@@ -17,49 +17,41 @@ const Chess = (function() {
 
    function setPawnPositions(x, y, color) {
       if (color === "w") {
+         //prevent attack from the front
          if (!cellIsTakenByOpponent(x, y - 1)) {
             setHighlightOnValidCells(x, y, [0, -1], false);
          }
+         //allow diagonal attacks
+         if (cellIsTakenByOpponent(x - 1, y - 1)) {
+            setHighlightOnValidCells(x, y, [-1, -1], false);
+         }
+         if (cellIsTakenByOpponent(x + 1, y - 1)) {
+            setHighlightOnValidCells(x, y, [1, -1], false);
+         }
          //first move for pawns have option of moving two spaces ahead
          if (y === 6) {
+            //prevent two tile jump when a piece is in front of it
             if (cellIsEmpty(x, y - 1)) {
                setHighlightOnValidCells(x, y, [0, -2], false);
             }
-            if (cellIsTakenByOpponent(x - 1, y - 1)) {
-               setHighlightOnValidCells(x, y, [-1, -1], false);
-            }
-            if (cellIsTakenByOpponent(x + 1, y - 1)) {
-               setHighlightOnValidCells(x, y, [1, -1], false);
-            }
-         } else {
-            if (cellIsTakenByOpponent(x - 1, y - 1)) {
-               setHighlightOnValidCells(x, y, [-1, -1], false);
-            }
-            if (cellIsTakenByOpponent(x + 1, y - 1)) {
-               setHighlightOnValidCells(x, y, [1, -1], false);
-            }
          }
       } else if (color === "b") {
+         //prevent attack from the front
          if (!cellIsTakenByOpponent(x, y + 1)) {
             setHighlightOnValidCells(x, y, [0, 1], false);
          }
+         //allow diagonal attacks
+         if (cellIsTakenByOpponent(x - 1, y + 1)) {
+            setHighlightOnValidCells(x, y, [-1, 1], false);
+         }
+         if (cellIsTakenByOpponent(x + 1, y + 1)) {
+            setHighlightOnValidCells(x, y, [1, 1], false);
+         }
          //first move for pawns have option of moving two spaces ahead
          if (y === 1) {
+            //prevent two tile jump when a piece is in front of it
             if (cellIsEmpty(x, y + 1)) {
                setHighlightOnValidCells(x, y, [0, 2], false);
-            }
-            if (cellIsTakenByOpponent(x - 1, y + 1)) {
-               setHighlightOnValidCells(x, y, [-1, 1], false);
-            }
-            if (cellIsTakenByOpponent(x + 1, y + 1)) {
-               setHighlightOnValidCells(x, y, [1, 1], false);
-            }
-         } else {
-            if (cellIsTakenByOpponent(x - 1, y + 1)) {
-               setHighlightOnValidCells(x, y, [-1, 1], false);
-            }
-            if (cellIsTakenByOpponent(x + 1, y + 1)) {
-               setHighlightOnValidCells(x, y, [1, 1], false);
             }
          }
       }
@@ -210,9 +202,6 @@ const Chess = (function() {
       possibleMoves.forEach(function(target) {
          target.addEventListener("click", function() {
             const cellIndex = parseInt(this.getAttribute("index"));
-
-            console.log("currentpicec 2: ", currentPiece.parentNode);
-
             const pieceIndex = parseInt(
                currentPiece.parentNode.getAttribute("index")
             );
@@ -241,8 +230,6 @@ const Chess = (function() {
             const currentPiece = this;
             const playerTurn = whiteTurn ? "w" : "b";
 
-            console.log("currentpiece: ", currentPiece);
-
             if (playerTurn === currentPiece.classList[1].substring(0, 1)) {
                if (currentPiece.parentNode.classList.contains("selected")) {
                   clearSelection();
@@ -251,7 +238,6 @@ const Chess = (function() {
                   currentPiece.parentNode.classList.add("selected");
                   highlightPossibleMoves(currentPiece);
                   moveSelectedPiece(currentPiece);
-                  console.log("shitshow");
                   if (gameIsWon()) {
                      document.getElementById("message").innerText = `${
                         whiteTurn ? "White" : "Black"
