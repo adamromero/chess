@@ -246,7 +246,8 @@ const Chess = (function() {
       }
    }
 
-   //TODO: check for when king moves into a checked position
+   //TODO: prevent king from moving into a checked position
+   //prevent movement of all pieces except king
    function check(piece) {
       const index = piece.parentNode.getAttribute("index");
       const x = convertIndexToCoordinates(index).x;
@@ -303,6 +304,10 @@ const Chess = (function() {
 
    function checkMate() {}
 
+   function gameOver() {
+      return document.querySelectorAll(".wkg, .bkg").length === 1;
+   }
+
    function isOpponentKing(x, y) {
       const kingClass = whiteTurn ? "bkg" : "wkg";
       return board[
@@ -318,7 +323,7 @@ const Chess = (function() {
       displayMessage("");
       const possibleMoves = document.querySelectorAll(".highlight");
 
-      possibleMoves.forEach(function(target) {
+      possibleMoves.forEach(function handleMovement(target) {
          target.addEventListener("click", function() {
             const cellIndex = parseInt(this.getAttribute("index"));
             const pieceIndex = parseInt(
@@ -334,16 +339,35 @@ const Chess = (function() {
                this.append(currentPiece);
                clearSelection();
                check(currentPiece);
-               //game is won
-               //displayMessage(`${whiteTurn ? "White" : "Black"} wins!`);
-               //pieces.removeEventListener("click", this, true);
+
+               if (gameOver()) {
+                  displayMessage(`${whiteTurn ? "White" : "Black"} wins!`);
+                  clearEventListeners();
+               }
                whiteTurn = !whiteTurn;
             }
          });
       });
    }
 
-   function bindMovement() {
+   function clearEventListeners() {
+      window.addEventListener(
+         "click",
+         function(event) {
+            event.stopPropagation();
+         },
+         true
+      );
+      window.addEventListener(
+         "mouseover",
+         function(event) {
+            event.stopPropagation();
+         },
+         true
+      );
+   }
+
+   function start() {
       pieces.forEach(function(piece) {
          piece.addEventListener("click", function() {
             const currentPiece = this;
@@ -381,11 +405,7 @@ const Chess = (function() {
       });
    }
 
-   function init() {
-      bindMovement();
-   }
-
-   return { init };
+   return { start };
 })();
 
-Chess.init();
+Chess.start();

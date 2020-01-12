@@ -1,8 +1,7 @@
-html,
 body {
    background: #232323;
    color: white;
-   font-family: "Fjalla One", Arial, Helvetica, sans-serif;
+   margin: 40px 0px;
 }
 
 .message {
@@ -10,20 +9,26 @@ body {
    text-align: center;
    font-weight: bold;
    letter-spacing: 4px;
-   font-size: 20px;
+   font-size: 16px;
+   margin: 11px 0;
+   line-height: 22px;
+   height: 22px;
 }
 
 h1 {
    color: white;
    text-align: center;
    text-transform: uppercase;
+   letter-spacing: 8px;
+   margin: 27px 0 0;
+   line-height: 25px;
 }
 
 .board {
    display: grid;
    grid-template-columns: repeat(8, 1fr);
    max-width: 512px;
-   margin: 50px auto 40px;
+   margin: auto;
    background: white;
 }
 
