@@ -73,4 +73,12 @@ h1 {
       max-width: 50px;
       width: 100%;
    }
+
+   .message {
+      font-size: 12px; 
+   }
+
+   h1 {
+      font-size: 28px;
+   }
 }
