@@ -3,6 +3,7 @@ const Chess = (function() {
    const pieces = document.querySelectorAll(".piece");
    const BOARD_SIZE = 8;
    let whiteTurn = true;
+   let isChecked = false;
 
    function convertIndexToCoordinates(index) {
       return {
@@ -39,20 +40,20 @@ const Chess = (function() {
       }
       //prevent attack from the front
       if (!cellIsTakenByOpponent(x, y + forward[1])) {
-         setHighlightOnValidCells(x, y, forward, false);
+         setHighlightOnValidCells(x, y, forward);
       }
       //allow diagonal attacks
       if (cellIsTakenByOpponent(x + left[0], y + left[1])) {
-         setHighlightOnValidCells(x, y, left, false);
+         setHighlightOnValidCells(x, y, left);
       }
       if (cellIsTakenByOpponent(x + right[0], y + right[1])) {
-         setHighlightOnValidCells(x, y, right, false);
+         setHighlightOnValidCells(x, y, right);
       }
       //first move for pawns have option of moving two spaces ahead
       if (y === row) {
          //prevent two tile jump when a piece is in front of it
          if (cellIsEmpty(x, y + forward[1])) {
-            setHighlightOnValidCells(x, y, twoForward, false);
+            setHighlightOnValidCells(x, y, twoForward);
          }
       }
    }
@@ -66,25 +67,25 @@ const Chess = (function() {
    }
 
    function setKnightPositions(x, y) {
-      setHighlightOnValidCells(x, y, [1, -2], false);
-      setHighlightOnValidCells(x, y, [-1, -2], false);
-      setHighlightOnValidCells(x, y, [-2, 1], false);
-      setHighlightOnValidCells(x, y, [-2, -1], false);
-      setHighlightOnValidCells(x, y, [2, 1], false);
-      setHighlightOnValidCells(x, y, [2, -1], false);
-      setHighlightOnValidCells(x, y, [1, 2], false);
-      setHighlightOnValidCells(x, y, [-1, 2], false);
+      setHighlightOnValidCells(x, y, [1, -2]);
+      setHighlightOnValidCells(x, y, [-1, -2]);
+      setHighlightOnValidCells(x, y, [-2, 1]);
+      setHighlightOnValidCells(x, y, [-2, -1]);
+      setHighlightOnValidCells(x, y, [2, 1]);
+      setHighlightOnValidCells(x, y, [2, -1]);
+      setHighlightOnValidCells(x, y, [1, 2]);
+      setHighlightOnValidCells(x, y, [-1, 2]);
    }
 
    function setKingPositions(x, y) {
-      setHighlightOnValidCells(x, y, [-1, -1], false);
-      setHighlightOnValidCells(x, y, [0, -1], false);
-      setHighlightOnValidCells(x, y, [1, -1], false);
-      setHighlightOnValidCells(x, y, [-1, 0], false);
-      setHighlightOnValidCells(x, y, [1, 0], false);
-      setHighlightOnValidCells(x, y, [-1, 1], false);
-      setHighlightOnValidCells(x, y, [0, 1], false);
-      setHighlightOnValidCells(x, y, [1, 1], false);
+      setHighlightOnValidCells(x, y, [-1, -1]);
+      setHighlightOnValidCells(x, y, [0, -1]);
+      setHighlightOnValidCells(x, y, [1, -1]);
+      setHighlightOnValidCells(x, y, [-1, 0]);
+      setHighlightOnValidCells(x, y, [1, 0]);
+      setHighlightOnValidCells(x, y, [-1, 1]);
+      setHighlightOnValidCells(x, y, [0, 1]);
+      setHighlightOnValidCells(x, y, [1, 1]);
    }
 
    function setHorizontalVerticalPositions(x, y) {
@@ -101,7 +102,7 @@ const Chess = (function() {
       setHighlightOnValidCells(x, y, [-1, 1], true);
    }
 
-   function setHighlightOnValidCells(x, y, shiftCoordinates, spanBoard) {
+   function setHighlightOnValidCells(x, y, shiftCoordinates, spanBoard = false) {
       let pieceBlocking = false;
       while (true) {
          x += shiftCoordinates[0];
@@ -145,8 +146,11 @@ const Chess = (function() {
       return false;
    }
 
-   function setHighlight(index) {
+   function setHighlight(index, checkedTile = false) {
       board[index].classList.add("highlight");
+      if (checkedTile) {
+         board[index].classList.add("checked");
+      }
    }
 
    function clearSelection() {
@@ -180,6 +184,7 @@ const Chess = (function() {
 
       if (isKing(piece)) {
          setKingPositions(x, y);
+         isCheckedPosition();
       }
    }
 
@@ -222,7 +227,7 @@ const Chess = (function() {
       }
    }
 
-   function kingIsInCheck(x, y, shiftCoordinates, spanBoard) {
+   function kingIsInCheck(x, y, shiftCoordinates, spanBoard = false) {
       let pieceBlocking = false;
       while (true) {
          x += shiftCoordinates[0];
@@ -232,8 +237,10 @@ const Chess = (function() {
                pieceBlocking = true;
                if (cellIsTakenByOpponent(x, y) && isOpponentKing(x, y)) {
                   displayMessage("Check");
-                  setHighlight(convertCoordinatesToIndex(x, y));
+                  setHighlight(convertCoordinatesToIndex(x, y), true);
+                  isChecked = true;
                } else {
+                  isChecked = false;
                   break;
                }
             }
@@ -247,7 +254,7 @@ const Chess = (function() {
    }
 
    //TODO: prevent king from moving into a checked position
-   //prevent movement of all pieces except king
+   //prevent movement of pieces that will expose king to check
    function check(piece) {
       const index = piece.parentNode.getAttribute("index");
       const x = convertIndexToCoordinates(index).x;
@@ -256,12 +263,12 @@ const Chess = (function() {
       if (isPawn(piece)) {
          if (whiteTurn) {
             //check white pawn attack
-            kingIsInCheck(x, y, [-1, -1], false);
-            kingIsInCheck(x, y, [1, -1], false);
+            kingIsInCheck(x, y, [-1, -1]);
+            kingIsInCheck(x, y, [1, -1]);
          } else {
             //check black pawn attack
-            kingIsInCheck(x, y, [-1, 1], false);
-            kingIsInCheck(x, y, [1, 1], false);
+            kingIsInCheck(x, y, [-1, 1]);
+            kingIsInCheck(x, y, [1, 1]);
          }
       }
 
@@ -280,29 +287,31 @@ const Chess = (function() {
       }
 
       if (isKnight(piece)) {
-         kingIsInCheck(x, y, [1, -2], false);
-         kingIsInCheck(x, y, [-1, -2], false);
-         kingIsInCheck(x, y, [-2, 1], false);
-         kingIsInCheck(x, y, [-2, -1], false);
-         kingIsInCheck(x, y, [2, 1], false);
-         kingIsInCheck(x, y, [2, -1], false);
-         kingIsInCheck(x, y, [1, 2], false);
-         kingIsInCheck(x, y, [-1, 2], false);
+         kingIsInCheck(x, y, [1, -2]);
+         kingIsInCheck(x, y, [-1, -2]);
+         kingIsInCheck(x, y, [-2, 1]);
+         kingIsInCheck(x, y, [-2, -1]);
+         kingIsInCheck(x, y, [2, 1]);
+         kingIsInCheck(x, y, [2, -1]);
+         kingIsInCheck(x, y, [1, 2]);
+         kingIsInCheck(x, y, [-1, 2]);
       }
 
       if (isKing(piece)) {
-         kingIsInCheck(x, y, [-1, -1], false);
-         kingIsInCheck(x, y, [0, -1], false);
-         kingIsInCheck(x, y, [1, -1], false);
-         kingIsInCheck(x, y, [-1, 0], false);
-         kingIsInCheck(x, y, [1, 0], false);
-         kingIsInCheck(x, y, [-1, 1], false);
-         kingIsInCheck(x, y, [0, 1], false);
-         kingIsInCheck(x, y, [1, 1], false);
+         kingIsInCheck(x, y, [-1, -1]);
+         kingIsInCheck(x, y, [0, -1]);
+         kingIsInCheck(x, y, [1, -1]);
+         kingIsInCheck(x, y, [-1, 0]);
+         kingIsInCheck(x, y, [1, 0]);
+         kingIsInCheck(x, y, [-1, 1]);
+         kingIsInCheck(x, y, [0, 1]);
+         kingIsInCheck(x, y, [1, 1]);
       }
    }
 
-   function checkMate() {}
+   function checkMate(king) {
+      
+   }
 
    function gameOver() {
       return document.querySelectorAll(".wkg, .bkg").length === 1;
@@ -340,6 +349,7 @@ const Chess = (function() {
                clearSelection();
                check(currentPiece);
 
+               //replace gameOver with checkMate once it is implemented
                if (gameOver()) {
                   displayMessage(`${whiteTurn ? "White" : "Black"} wins!`);
                   clearEventListeners();
@@ -367,6 +377,13 @@ const Chess = (function() {
       );
    }
 
+   function selectPiece(piece) {
+      clearSelection();
+      piece.parentNode.classList.add("selected");
+      highlightPossibleMoves(piece);
+      moveSelectedPiece(piece);
+   }
+
    function start() {
       pieces.forEach(function(piece) {
          piece.addEventListener("click", function() {
@@ -379,10 +396,11 @@ const Chess = (function() {
                   clearSelection();
                } else {
                   //this allows player to select a piece
-                  clearSelection();
-                  currentPiece.parentNode.classList.add("selected");
-                  highlightPossibleMoves(currentPiece);
-                  moveSelectedPiece(currentPiece);
+                  if (!isChecked) {
+                     selectPiece(currentPiece);
+                  } else if (isKing(currentPiece)) {
+                     selectPiece(currentPiece);
+                  }
                }
             }
          });
