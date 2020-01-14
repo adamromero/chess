@@ -102,7 +102,12 @@ const Chess = (function() {
       setHighlightOnValidCells(x, y, [-1, 1], true);
    }
 
-   function setHighlightOnValidCells(x, y, shiftCoordinates, spanBoard = false) {
+   function setHighlightOnValidCells(
+      x,
+      y,
+      shiftCoordinates,
+      spanBoard = false
+   ) {
       let pieceBlocking = false;
       while (true) {
          x += shiftCoordinates[0];
@@ -254,10 +259,17 @@ const Chess = (function() {
    }
 
    function isHighlighted(x, y) {
-      return board[convertCoordinatesToIndex(x, y)].classList.contains("highlight");
+      return board[convertCoordinatesToIndex(x, y)].classList.contains(
+         "highlight"
+      );
    }
 
-   function removeHighlightedKingMoves(x, y, shiftCoordinates, spanBoard = false) {
+   function removeHighlightedKingMoves(
+      x,
+      y,
+      shiftCoordinates,
+      spanBoard = false
+   ) {
       let pieceBlocking = false;
       while (true) {
          x += shiftCoordinates[0];
@@ -265,8 +277,32 @@ const Chess = (function() {
          if (coordinatesInBounds(x, y) && !pieceBlocking) {
             if (!cellIsEmpty(x, y)) {
                pieceBlocking = true;
-            } else if (isHighlighted(x, y)) {
-               board[convertCoordinatesToIndex(x, y)].classList.remove("highlight");
+            } else {
+               if (isHighlighted(x, y)) {
+                  board[convertCoordinatesToIndex(x, y)].classList.remove(
+                     "highlight"
+                  );
+               }
+            }
+            if (!spanBoard) {
+               break;
+            }
+         } else {
+            break;
+         }
+      }
+   }
+
+   function setPaths(x, y, shiftCoordinates, spanBoard = false) {
+      let pieceBlocking = false;
+      while (true) {
+         x += shiftCoordinates[0];
+         y += shiftCoordinates[1];
+         if (coordinatesInBounds(x, y) && !pieceBlocking) {
+            if (!cellIsEmpty(x, y)) {
+               pieceBlocking = true;
+            } else {
+               board[convertCoordinatesToIndex(x, y)].classList.add("path");
             }
             if (!spanBoard) {
                break;
@@ -279,9 +315,9 @@ const Chess = (function() {
 
    function isOpponentPiece(piece) {
       if (whiteTurn) {
-         return piece.classList[1].substring(0, 1) === "b"
-      } 
-      return piece.classList[1].substring(0, 1) === "w"
+         return piece.classList[1].substring(0, 1) === "b";
+      }
+      return piece.classList[1].substring(0, 1) === "w";
    }
 
    function isCheckedPosition() {
@@ -290,46 +326,97 @@ const Chess = (function() {
          const x = convertIndexToCoordinates(index).x;
          const y = convertIndexToCoordinates(index).y;
 
-         if (isRook(piece) && isOpponentPiece(piece) || isQueen(piece) && isOpponentPiece(piece)) {
-            removeHighlightedKingMoves(x, y, [0, -1], true);
-            removeHighlightedKingMoves(x, y, [0, 1], true);
-            removeHighlightedKingMoves(x, y, [-1, 0], true);
-            removeHighlightedKingMoves(x, y, [1, 0], true);
-         }
+         if (isOpponentPiece(piece)) {
+            if (isRook(piece) || isQueen(piece)) {
+               removeHighlightedKingMoves(x, y, [0, -1], true);
+               removeHighlightedKingMoves(x, y, [0, 1], true);
+               removeHighlightedKingMoves(x, y, [-1, 0], true);
+               removeHighlightedKingMoves(x, y, [1, 0], true);
+            }
 
-         if (isBishop(piece) && isOpponentPiece(piece) || isQueen(piece) && isOpponentPiece(piece)) {
-            removeHighlightedKingMoves(x, y, [-1, -1], true);
-            removeHighlightedKingMoves(x, y, [1, -1], true);
-            removeHighlightedKingMoves(x, y, [1, 1], true);
-            removeHighlightedKingMoves(x, y, [-1, 1], true);
-         }
+            if (isBishop(piece) || isQueen(piece)) {
+               removeHighlightedKingMoves(x, y, [-1, -1], true);
+               removeHighlightedKingMoves(x, y, [1, -1], true);
+               removeHighlightedKingMoves(x, y, [1, 1], true);
+               removeHighlightedKingMoves(x, y, [-1, 1], true);
+            }
 
-         if (isKnight(piece) && isOpponentPiece(piece)) {
-            removeHighlightedKingMoves(x, y, [1, -2]);
-            removeHighlightedKingMoves(x, y, [-1, -2]);
-            removeHighlightedKingMoves(x, y, [-2, 1]);
-            removeHighlightedKingMoves(x, y, [-2, -1]);
-            removeHighlightedKingMoves(x, y, [2, 1]);
-            removeHighlightedKingMoves(x, y, [2, -1]);
-            removeHighlightedKingMoves(x, y, [1, 2]);
-            removeHighlightedKingMoves(x, y, [-1, 2]);
-         }
+            if (isKnight(piece)) {
+               removeHighlightedKingMoves(x, y, [1, -2]);
+               removeHighlightedKingMoves(x, y, [-1, -2]);
+               removeHighlightedKingMoves(x, y, [-2, 1]);
+               removeHighlightedKingMoves(x, y, [-2, -1]);
+               removeHighlightedKingMoves(x, y, [2, 1]);
+               removeHighlightedKingMoves(x, y, [2, -1]);
+               removeHighlightedKingMoves(x, y, [1, 2]);
+               removeHighlightedKingMoves(x, y, [-1, 2]);
+            }
 
-         if (isKing(piece) && isOpponentPiece(piece)) {
-            removeHighlightedKingMoves(x, y, [-1, -1]);
-            removeHighlightedKingMoves(x, y, [0, -1]);
-            removeHighlightedKingMoves(x, y, [1, -1]);
-            removeHighlightedKingMoves(x, y, [-1, 0]);
-            removeHighlightedKingMoves(x, y, [1, 0]);
-            removeHighlightedKingMoves(x, y, [-1, 1]);
-            removeHighlightedKingMoves(x, y, [0, 1]);
-            removeHighlightedKingMoves(x, y, [1, 1]);
+            if (isKing(piece)) {
+               removeHighlightedKingMoves(x, y, [-1, -1]);
+               removeHighlightedKingMoves(x, y, [0, -1]);
+               removeHighlightedKingMoves(x, y, [1, -1]);
+               removeHighlightedKingMoves(x, y, [-1, 0]);
+               removeHighlightedKingMoves(x, y, [1, 0]);
+               removeHighlightedKingMoves(x, y, [-1, 1]);
+               removeHighlightedKingMoves(x, y, [0, 1]);
+               removeHighlightedKingMoves(x, y, [1, 1]);
+            }
          }
       });
    }
 
-   //TODO: prevent king from moving into a checked position
-   //prevent movement of pieces that will expose king to check
+   function clearPaths() {
+      board.forEach(function(cell) {
+         cell.classList.remove("path");
+      });
+   }
+
+   function setPathsForMovedPiece(piece) {
+      const index = piece.parentNode.getAttribute("index");
+      const x = convertIndexToCoordinates(index).x;
+      const y = convertIndexToCoordinates(index).y;
+
+      if (!isOpponentPiece(piece)) {
+         if (isRook(piece) || isQueen(piece)) {
+            setPaths(x, y, [0, -1], true);
+            setPaths(x, y, [0, 1], true);
+            setPaths(x, y, [-1, 0], true);
+            setPaths(x, y, [1, 0], true);
+         }
+
+         if (isBishop(piece) || isQueen(piece)) {
+            setPaths(x, y, [-1, -1], true);
+            setPaths(x, y, [1, -1], true);
+            setPaths(x, y, [1, 1], true);
+            setPaths(x, y, [-1, 1], true);
+         }
+
+         if (isKnight(piece)) {
+            setPaths(x, y, [1, -2]);
+            setPaths(x, y, [-1, -2]);
+            setPaths(x, y, [-2, 1]);
+            setPaths(x, y, [-2, -1]);
+            setPaths(x, y, [2, 1]);
+            setPaths(x, y, [2, -1]);
+            setPaths(x, y, [1, 2]);
+            setPaths(x, y, [-1, 2]);
+         }
+
+         if (isKing(piece)) {
+            setPaths(x, y, [-1, -1]);
+            setPaths(x, y, [0, -1]);
+            setPaths(x, y, [1, -1]);
+            setPaths(x, y, [-1, 0]);
+            setPaths(x, y, [1, 0]);
+            setPaths(x, y, [-1, 1]);
+            setPaths(x, y, [0, 1]);
+            setPaths(x, y, [1, 1]);
+         }
+      }
+   }
+
+   //TODO: prevent movement of pieces that will expose king to check
    function check(piece) {
       const index = piece.parentNode.getAttribute("index");
       const x = convertIndexToCoordinates(index).x;
@@ -384,8 +471,55 @@ const Chess = (function() {
       }
    }
 
-   function checkMate(king) {
-      
+   function kingMoveIsBlocked(x, y, shiftCoordinates, color) {
+      console.log("checking if king is blocked");
+
+      while (true) {
+         x += shiftCoordinates[0];
+         y += shiftCoordinates[1];
+         if (coordinatesInBounds(x, y)) {
+            if (!cellIsEmpty(x, y)) {
+               return (
+                  getColorOfPiece(
+                     board[convertCoordinatesToIndex(x, y)].firstElementChild
+                  ) === color
+               );
+            } else {
+               return pathInKingPosition(x, y);
+            }
+         } else {
+            return true;
+         }
+      }
+   }
+
+   function getColorOfPiece(piece) {
+      return piece.classList[1].substring(0, 1);
+   }
+
+   function pathInKingPosition(x, y) {
+      return board[convertCoordinatesToIndex(x, y)].classList.contains("path");
+   }
+
+   //TODO: need to make sure there is at least one empty space and it contains a path
+   function checkMate() {
+      const kingClass = whiteTurn ? ".bkg" : ".wkg";
+      const king = document.querySelector(kingClass);
+      const index = king.parentNode.getAttribute("index");
+      const color = getColorOfPiece(king);
+      const x = convertIndexToCoordinates(index).x;
+      const y = convertIndexToCoordinates(index).y;
+
+      return (
+         kingMoveIsBlocked(x, y, [-1, -1], color) &&
+         kingMoveIsBlocked(x, y, [0, -1], color) &&
+         kingMoveIsBlocked(x, y, [1, -1], color) &&
+         kingMoveIsBlocked(x, y, [-1, 0], color) &&
+         kingMoveIsBlocked(x, y, [1, 0], color) &&
+         kingMoveIsBlocked(x, y, [-1, 1], color) &&
+         kingMoveIsBlocked(x, y, [0, 1], color) &&
+         kingMoveIsBlocked(x, y, [1, 1], color)
+      );
    }
 
    function gameOver() {
@@ -419,13 +553,15 @@ const Chess = (function() {
                currentPiece.parentNode.classList.contains("selected") &&
                cellIndex !== pieceIndex
             ) {
+               clearPaths();
                this.innerHTML = "";
                this.append(currentPiece);
+               setPathsForMovedPiece(currentPiece);
                clearSelection();
                check(currentPiece);
 
                //replace gameOver with checkMate once it is implemented
-               if (gameOver()) {
+               if (checkMate()) {
                   displayMessage(`${whiteTurn ? "White" : "Black"} wins!`);
                   clearEventListeners();
                }
