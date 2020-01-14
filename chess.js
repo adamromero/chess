@@ -253,6 +253,81 @@ const Chess = (function() {
       }
    }
 
+   function isHighlighted(x, y) {
+      return board[convertCoordinatesToIndex(x, y)].classList.contains("highlight");
+   }
+
+   function removeHighlightedKingMoves(x, y, shiftCoordinates, spanBoard = false) {
+      let pieceBlocking = false;
+      while (true) {
+         x += shiftCoordinates[0];
+         y += shiftCoordinates[1];
+         if (coordinatesInBounds(x, y) && !pieceBlocking) {
+            if (!cellIsEmpty(x, y)) {
+               pieceBlocking = true;
+            } else if (isHighlighted(x, y)) {
+               board[convertCoordinatesToIndex(x, y)].classList.remove("highlight");
+            }
+            if (!spanBoard) {
+               break;
+            }
+         } else {
+            break;
+         }
+      }
+   }
+
+   function isOpponentPiece(piece) {
+      if (whiteTurn) {
+         return piece.classList[1].substring(0, 1) === "b"
+      } 
+      return piece.classList[1].substring(0, 1) === "w"
+   }
+
+   function isCheckedPosition() {
+      pieces.forEach(function(piece) {
+         const index = piece.parentNode.getAttribute("index");
+         const x = convertIndexToCoordinates(index).x;
+         const y = convertIndexToCoordinates(index).y;
+
+         if (isRook(piece) && isOpponentPiece(piece) || isQueen(piece) && isOpponentPiece(piece)) {
+            removeHighlightedKingMoves(x, y, [0, -1], true);
+            removeHighlightedKingMoves(x, y, [0, 1], true);
+            removeHighlightedKingMoves(x, y, [-1, 0], true);
+            removeHighlightedKingMoves(x, y, [1, 0], true);
+         }
+
+         if (isBishop(piece) && isOpponentPiece(piece) || isQueen(piece) && isOpponentPiece(piece)) {
+            removeHighlightedKingMoves(x, y, [-1, -1], true);
+            removeHighlightedKingMoves(x, y, [1, -1], true);
+            removeHighlightedKingMoves(x, y, [1, 1], true);
+            removeHighlightedKingMoves(x, y, [-1, 1], true);
+         }
+
+         if (isKnight(piece) && isOpponentPiece(piece)) {
+            removeHighlightedKingMoves(x, y, [1, -2]);
+            removeHighlightedKingMoves(x, y, [-1, -2]);
+            removeHighlightedKingMoves(x, y, [-2, 1]);
+            removeHighlightedKingMoves(x, y, [-2, -1]);
+            removeHighlightedKingMoves(x, y, [2, 1]);
+            removeHighlightedKingMoves(x, y, [2, -1]);
+            removeHighlightedKingMoves(x, y, [1, 2]);
+            removeHighlightedKingMoves(x, y, [-1, 2]);
+         }
+
+         if (isKing(piece) && isOpponentPiece(piece)) {
+            removeHighlightedKingMoves(x, y, [-1, -1]);
+            removeHighlightedKingMoves(x, y, [0, -1]);
+            removeHighlightedKingMoves(x, y, [1, -1]);
+            removeHighlightedKingMoves(x, y, [-1, 0]);
+            removeHighlightedKingMoves(x, y, [1, 0]);
+            removeHighlightedKingMoves(x, y, [-1, 1]);
+            removeHighlightedKingMoves(x, y, [0, 1]);
+            removeHighlightedKingMoves(x, y, [1, 1]);
+         }
+      });
+   }
+
    //TODO: prevent king from moving into a checked position
    //prevent movement of pieces that will expose king to check
    function check(piece) {
